@@ -22,11 +22,6 @@ MANIFEST_PATH = MANAGED_ROOT / "manifest.json"
 SCHEMA_VERSION = 1
 MANAGED_FILES = (
     Path("runtime/HARNESS.md"),
-    Path("runtime/系统流程.md"),
-    Path("runtime/整体编排/任务交付闭环.md"),
-    Path("runtime/整体编排/系统演进闭环.md"),
-    Path("runtime/运行记录模板.md"),
-    Path("flows/流程路由.md"),
 )
 PROJECT_SKILLS = {
     "intent",
