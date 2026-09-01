@@ -1,0 +1,4 @@
+interface:
+  display_name: "build"
+  short_description: "根据建设目标选择并执行四类独立的项目知识建设子能力"
+  default_prompt: "使用 $build 根据当前项目知识建设目标选择并执行对应子能力。"

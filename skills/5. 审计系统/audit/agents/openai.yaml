@@ -1,0 +1,4 @@
+interface:
+  display_name: "audit"
+  short_description: "接收审计包，独立只读核验证据并输出审计报告"
+  default_prompt: "使用 $audit 在独立只读上下文中审计这份已确定的交付候选或知识候选审计包，并依据证据给出通过或不通过的审计报告。"

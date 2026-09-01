@@ -1,0 +1,4 @@
+interface:
+  display_name: "retro"
+  short_description: "基于真实运行证据复盘 Harness，输出可验证、可回退的改进候选"
+  default_prompt: "使用 $retro 基于真实运行证据复盘这次 Harness 任务，并形成有依据的改进候选。"

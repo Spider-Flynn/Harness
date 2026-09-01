@@ -1,0 +1,4 @@
+interface:
+  display_name: "coding"
+  short_description: "按已确认行为和范围安全修改生产代码"
+  default_prompt: "使用 $coding 按已确认的目标行为和边界修改生产代码，并报告代码检查证据与未验证风险。"

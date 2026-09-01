@@ -1,0 +1,4 @@
+interface:
+  display_name: "debug"
+  short_description: "只读复现问题并建立可验证的根因证据链"
+  default_prompt: "使用 $debug 只读诊断这个问题，通过证据链和单一假设验证确认根因、未知项与修复边界。"

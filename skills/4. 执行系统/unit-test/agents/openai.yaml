@@ -1,0 +1,4 @@
+interface:
+  display_name: "unit-test"
+  short_description: "用 Mock 隔离外部依赖，验证复杂内部行为"
+  default_prompt: "使用 $unit-test 设计、编写并运行白盒单元测试；无 HTTP 功能可作为主要证据，API 功能仅补充复杂内部逻辑，不修改生产代码。"

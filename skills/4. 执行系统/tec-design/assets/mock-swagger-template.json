@@ -1,0 +1,163 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "替换为模块或功能名称",
+    "version": "last"
+  },
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "securityDefinitions": {
+    "BearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "替换为接口分类"
+    }
+  ],
+  "paths": {
+    "/api/example/list": {
+      "get": {
+        "tags": [
+          "替换为接口分类"
+        ],
+        "summary": "替换为接口名称",
+        "description": "替换为接口说明；无说明时保留空字符串",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": true,
+            "description": "页码",
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "object",
+              "title": "ResultPageExample",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "description": "状态码，0 表示成功"
+                },
+                "msg": {
+                  "type": "string",
+                  "description": "返回信息"
+                },
+                "data": {
+                  "type": "array",
+                  "description": "列表数据",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "主键"
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "名称"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name"
+                    ]
+                  }
+                },
+                "total": {
+                  "type": "integer",
+                  "format": "int64",
+                  "description": "总数"
+                }
+              },
+              "required": [
+                "code",
+                "msg",
+                "data"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/api/example/create": {
+      "post": {
+        "tags": [
+          "替换为接口分类"
+        ],
+        "summary": "替换为接口名称",
+        "description": "替换为接口说明；无说明时保留空字符串",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "root",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "title": "ExampleCreateRequest",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "名称"
+                },
+                "enabled": {
+                  "type": "boolean",
+                  "description": "是否启用"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "object",
+              "title": "ResultBoolean",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "description": "状态码，0 表示成功"
+                },
+                "msg": {
+                  "type": "string",
+                  "description": "返回信息"
+                },
+                "data": {
+                  "type": "boolean",
+                  "description": "处理结果"
+                }
+              },
+              "required": [
+                "code",
+                "msg",
+                "data"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

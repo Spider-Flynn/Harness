@@ -1,0 +1,4 @@
+interface:
+  display_name: "biz"
+  short_description: "通过持续问答识别业务盲区、补充关联知识并沉淀理解过程"
+  default_prompt: "使用 $biz 通过逐步问答帮助我深化业务理解，并记录认知过程与当前结论。"

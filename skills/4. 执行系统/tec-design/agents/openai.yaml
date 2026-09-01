@@ -1,0 +1,4 @@
+interface:
+  display_name: "tec-design"
+  short_description: "按功能、数据与流程依赖形成技术设计"
+  default_prompt: "使用 $tec-design 基于已确认目标和必要现状，依次收敛功能规则、核心数据、数据源规则与具体流程，形成简洁且内部一致的技术设计及必要接口契约。"

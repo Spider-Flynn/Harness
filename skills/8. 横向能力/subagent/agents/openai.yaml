@@ -1,0 +1,7 @@
+interface:
+  display_name: "subagent"
+  short_description: "隔离任务分支与独立复核，由主会话分层汇总"
+  default_prompt: "使用 $subagent 识别主干与可封闭返回的分支，隔离执行或独立复核后按上一层任务粒度汇总。"
+
+policy:
+  allow_implicit_invocation: true

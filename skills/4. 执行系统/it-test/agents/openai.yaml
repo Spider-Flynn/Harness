@@ -1,0 +1,4 @@
+interface:
+  display_name: "IT-test"
+  short_description: "自行启动服务，以真实 HTTP 发现并闭环 API 问题"
+  default_prompt: "使用 $it-test 自行独立启动本地服务，通过真实 HTTP、真实鉴权、数据和副作用验证 API，并为失败形成可回交的证据。"

@@ -1,0 +1,4 @@
+interface:
+  display_name: "router"
+  short_description: "按风险选择软件开发执行路线"
+  default_prompt: "使用 $router 根据当前任务风险，判断是否需要技术设计、稳定文档、测试设计和 TDD，并形成执行路线。"

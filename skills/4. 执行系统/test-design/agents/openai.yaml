@@ -1,0 +1,4 @@
+interface:
+  display_name: "test-design"
+  short_description: "将目标行为与契约转成可判断的新功能和回归测试场景"
+  default_prompt: "使用 $test-design 根据已确认的目标行为、约束、契约和受影响既有行为，设计可追溯、可判断的需求级测试场景与预期。"

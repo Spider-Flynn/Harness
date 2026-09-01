@@ -1,0 +1,4 @@
+interface:
+  display_name: "know"
+  short_description: "检索并整合项目知识信息元，受控沉淀具有持续价值的变化"
+  default_prompt: "使用 $know 检索当前任务所需的项目知识并形成任务信息集合。"

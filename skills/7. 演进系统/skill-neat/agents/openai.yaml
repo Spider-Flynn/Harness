@@ -1,0 +1,4 @@
+interface:
+  display_name: "skill-neat"
+  short_description: "迭代已有 Skill 的规则、元数据与资源，清理冲突、冗余和过程残留"
+  default_prompt: "使用 $skill-neat 迭代这个已有 Skill，先还原根本问题并选择正确载体，再仅依据最终 Skill 完成隔离审计。"
