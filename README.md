@@ -1,52 +1,76 @@
 # Harness Engineering
 
-Harness Engineering 是面向真实软件项目的 AI Coding 工程系统，当前在 Powers 仓库内建设。
-核心 Skills、运行入口和本地接入工具已完成初步实现，但尚未接入真实业务项目或标记为启用。
+Harness Engineering 是一个在人工治理下、由用户意图驱动的 AI Coding 工程系统。项目围绕知识、
+路由、执行、审计、交付和系统演进组织可组合能力，目标是让软件任务的输入、决策、实现、验证与
+交付边界可追溯。
+
+本仓库当前处于设计与初步实现阶段，尚未完成真实业务项目的主链验证，也未标记为启用。
+
+## 当前状态
+
+- 系统架构、七个子系统、整体运行闭环和最小 Skill 拓扑已有设计载体。
+- 核心 Skills、运行记录模板和项目接入脚本已有初步源码。
+- `scripts/harness.py` 与目标设计期待 `design/dev/fix`，当前执行系统源码目录则是
+  `tec-design/test-design/coding/debug/unit-test/it-test`。在这组拓扑收敛并重新验证前，
+  `init/doctor/update/remove` 不能视为可用的接入能力。
+- 静态设计或脚本存在不代表真实路由、外部操作、失败恢复和完整交付链已经验证。
 
 ## 项目结构
 
 | 目录 | 职责 |
 |---|---|
-| `docs/` | 系统架构、子系统设计、实施路线和问题记录 |
-| `runtime/` | Harness 全局运行与编排入口 |
-| `flows/` | 工作流程及其 Skill 编排信息 |
-| `skills/` | 按子系统或横向职责分类的 Harness 独立能力源码 |
-| `agents/` | 固定职责、Prompt 和权限的专用 Agent 配置 |
-| `scripts/` | 项目接入、检查、更新和解除接入工具 |
+| `docs/` | 系统架构、子系统设计、实施方案和问题记录 |
+| `runtime/` | 全局运行入口、跨系统状态与整体闭环 |
+| `flows/` | 可复用流程及其 Skill 编排，不承载单项能力实现规则 |
+| `skills/` | 按子系统、横向能力或额外能力分类的独立 Skill 源码 |
+| `agents/` | 固定职责、Prompt 与权限边界的专用 Agent 配置 |
+| `scripts/` | 项目接入与维护工具 |
 
-系统设计以[系统架构](./docs/系统架构.md)为入口，[流程路由](./flows/流程路由.md)维护可选流程，
-[Skill 能力设计](./docs/实施方案/Skill%20能力设计.md)维护最小能力拓扑，
-[Harness 运行入口](./runtime/HARNESS.md)连接任务交付与系统演进闭环。
+主要阅读入口：
 
-`skills/` 第一层直接使用中文编号，第二层才是 Codex-compatible Skill：
+- [系统架构](./docs/系统架构.md)：项目定位、系统边界和架构原则。
+- [Skill 能力设计](./docs/实施方案/Skill%20能力设计.md)：目标能力拓扑与能力合同。
+- [流程路由](./flows/流程路由.md)：可选流程及选择边界。
+- [Harness 运行入口](./runtime/HARNESS.md)：未来接入业务项目后的全局运行规则。
+- [任务交付闭环](./runtime/整体编排/任务交付闭环.md)：业务任务的跨系统状态与交接。
+- [系统演进闭环](./runtime/整体编排/系统演进闭环.md)：Harness 自身的受控改进流程。
 
-| 目标一级目录 | 目标 Skill | 归属说明 |
-|---|---|---|
-| `1. 意图接入系统/` | `intent`、`cooper` | 意图确认与指定 Cooper 材料读取 |
-| `2. 知识系统/` | `know`、`build` | 项目知识检索与沉淀，以及四类独立知识建设子能力的显式路由 |
-| `3. 路由系统/` | `router` | 工作流程选择 |
-| `4. 执行系统/` | `design`、`dev`、`debug`、`fix`、`it-test` | 设计、实现、诊断、修复与真实 HTTP 验收 |
-| `5. 审计系统/` | `audit` | 交付候选和知识候选的独立审计 |
-| `6. 交付系统/` | `cr` | 人工 Review、反馈和交付组织 |
-| `7. 演进系统/` | `retro`、`skill-creator`、`skill-neat` | 复盘 Harness 运行并受控实施系统改进 |
-| `8. 横向能力/` | `subagent` | 跨系统的分支、隔离、并行与结果回收 |
-| `9. 额外能力/` | `biz`、`mock` | 条件业务理解与 Mock 平台管理 |
+## 能力分层
 
-13 个固定 Skill 与三个条件扩展能力会投影到接入项目；
-`skill-creator` 和 `skill-neat` 只服务 Harness 演进，不投影到业务项目。`test-design`、
-`coding-standards` 和 `unit-test` 已由目标能力或运行机制替代。所有能力在真实主链试运行前保持未启用。
+| 分类 | 当前公开源码 |
+|---|---|
+| `1. 意图接入系统` | `intent` |
+| `2. 知识系统` | `know`、`build` |
+| `3. 路由系统` | `router` |
+| `4. 执行系统` | `tec-design`、`test-design`、`coding`、`debug`、`unit-test`、`it-test` |
+| `5. 审计系统` | `audit` |
+| `6. 交付系统` | `cr` |
+| `7. 演进系统` | `retro`、`skill-creator`、`skill-neat` |
+| `8. 横向能力` | `subagent` |
+| `9. 额外能力` | `biz` |
 
-## 初步运行
+`cooper` 与 `mock` 是永久仅限本机的能力副本，由根目录 `.gitignore` 排除，不属于公开仓库源码。
+`skill-creator` 与 `skill-neat` 只服务 Harness 演进控制面，不投影到业务项目。
 
-在本地业务项目建立受管入口：
+## 实验性接入工具
+
+脚本提供以下命令入口：
 
 ```bash
+python3 scripts/harness.py --help
 python3 scripts/harness.py init --project <业务项目目录>
 python3 scripts/harness.py doctor --project <业务项目目录>
+python3 scripts/harness.py update --project <业务项目目录>
+python3 scripts/harness.py remove --project <业务项目目录>
 ```
 
-`init` 会复制 `.harness/runtime/` 与流程入口，并把分层源码扁平投影到业务项目
-`.agents/skills/<skill>`；它不会修改业务项目 `AGENTS.md`。接入后仍需由业务项目规则明确
-“软件开发任务先读取 `.harness/runtime/HARNESS.md`”，并在首次启用前显式运行 `build` 建设
-项目知识体系，再按该入口运行意图、任务信息整合、
-路由、执行、独立审计和人工交付。当前只在临时目录试用过接入命令，尚未接入真实业务项目。
+当前拓扑不一致尚未解决，以上命令只作为实施源码与后续验证入口保留，不应直接用于业务项目。
+完成拓扑收敛后，仍需在经授权的低风险业务项目中验证正常链、问题回流、恢复和解除接入。
+
+## 维护约定
+
+- 变更前先读取当前文件和直接合同，区分目标设计、当前实现与验证结果。
+- 单个子系统只维护自身职责；跨系统时序、状态、失效、恢复、终止和交接归 `runtime/` 与整体编排。
+- Powers 与本仓库的同名 Skill 不自动同步；吸收变化前先比较差异并确认适用边界。
+- 不把静态检查、Mock、模型判断或脚本存在描述成真实业务链路已经通过。
+- 所有公开提交都应遵守 [AGENTS.md](./AGENTS.md) 中的项目边界、Git 规则与维护要求。
