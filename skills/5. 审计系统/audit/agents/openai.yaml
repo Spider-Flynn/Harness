@@ -1,4 +1,4 @@
 interface:
   display_name: "audit"
-  short_description: "接收审计包，独立只读核验证据并输出审计报告"
-  default_prompt: "使用 $audit 在独立只读上下文中审计这份已确定的交付候选或知识候选审计包，并依据证据给出通过或不通过的审计报告。"
+  short_description: "围绕需求独立审计改动边界、存量影响和证据"
+  default_prompt: "使用 $audit 在独立只读上下文中审计这份候选，围绕当前需求核验需求覆盖、修改相关性、存量影响、实现简洁性、项目架构和验证证据。"
