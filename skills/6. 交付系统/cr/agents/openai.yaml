@@ -1,4 +1,0 @@
-interface:
-  display_name: "cr"
-  short_description: "组织人工审查与授权，完成受控交付并记录结果"
-  default_prompt: "使用 $cr 组织这份已确定交付审查包的人工 Review，记录人的反馈、决定与授权，并在授权范围内完成或核验交付结果。"

@@ -1,0 +1,4 @@
+interface:
+  display_name: "cr"
+  short_description: "对齐人工反馈，解释疑问并判断后续处理方向"
+  default_prompt: "使用 $cr 对齐我对当前代码、设计或测试候选的反馈；先解释和判断事实，再说明是否需要进入后续处理。"

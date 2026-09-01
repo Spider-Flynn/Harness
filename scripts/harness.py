@@ -28,18 +28,18 @@ PROJECT_SKILLS = {
     "know",
     "build",
     "router",
-    "design",
-    "dev",
+    "tec-design",
+    "test-design",
+    "coding",
     "debug",
-    "fix",
+    "unit-test",
     "it-test",
     "audit",
-    "cr",
-    "retro",
     "subagent",
 }
 OPTIONAL_PROJECT_SKILLS = {"cooper", "biz", "mock"}
-CONTROL_PLANE_SKILLS = {"skill-creator", "skill-neat"}
+PERSONAL_SKILLS = {"cr"}
+EVOLUTION_SKILLS = {"retro", "skill-creator", "skill-neat"}
 
 
 class HarnessError(RuntimeError):
@@ -126,7 +126,7 @@ def _discover_skills() -> dict[str, Path]:
         skills[name] = skill_dir.resolve()
     if not skills:
         raise HarnessError("没有发现可接入的 Harness Skill")
-    expected = PROJECT_SKILLS | CONTROL_PLANE_SKILLS
+    expected = PROJECT_SKILLS | EVOLUTION_SKILLS | PERSONAL_SKILLS
     missing = sorted(expected - set(skills))
     if missing:
         raise HarnessError("缺少系统必需 Skill：" + "、".join(missing))
@@ -141,7 +141,7 @@ def _project_skills(skills: dict[str, Path]) -> dict[str, Path]:
     return {
         name: path
         for name, path in skills.items()
-        if name not in CONTROL_PLANE_SKILLS
+        if name in PROJECT_SKILLS
     }
 
 
