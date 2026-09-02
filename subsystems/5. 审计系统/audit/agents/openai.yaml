@@ -1,4 +1,4 @@
 interface:
   display_name: "audit"
-  short_description: "围绕需求独立审计改动边界、存量影响和证据"
-  default_prompt: "使用 $audit 在独立只读上下文中审计这份候选，围绕当前需求核验需求覆盖、修改相关性、存量影响、实现简洁性、项目架构和验证证据。"
+  short_description: "创建并管理有限轮次的独立审计 Subagent"
+  default_prompt: "使用 $audit 为当前路线创建只读 Audit Subagent，核验需求覆盖、改动相关性、存量影响、实现质量和证据，由主会话处理反馈并按有限轮次复审。"
