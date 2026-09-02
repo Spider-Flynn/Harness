@@ -6,10 +6,11 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from ..binding import desired_manifest, load_binding_manifest
+from ..binding import desired_manifest, link_records, load_binding_manifest
 from ..catalog import discover_systems
 from ..errors import HarnessError
 from ..filesystem import managed_path, resolved_link
+from ..git_hooks import check_git_hooks, plan_git_hooks
 from ..paths import HARNESS_ROOT
 from ..rules import rule_block_matches
 from ..storage import load_registry, project_lock, registry_recovery_hint
@@ -27,11 +28,17 @@ def _check_binding(
         return errors, notices
 
     try:
+        expected_git_hooks = plan_git_hooks(
+            project,
+            system,
+            manifest.get("git_hooks", {}),
+        )
         expected = desired_manifest(
             project,
             system,
             manifest["selected_skills"],
             manifest["rules_files"],
+            expected_git_hooks,
         )
     except HarnessError as exc:
         errors.append(str(exc))
@@ -42,18 +49,8 @@ def _check_binding(
     if manifest["project_root"] != str(project):
         notices.append("目标项目目录已经移动；请运行 relink 更新绑定记录")
 
-    expected_links = {
-        expected["runtime_link"]["path"]: expected["runtime_link"]["source"],
-        **{
-            name: item["source"] for name, item in expected["skill_links"].items()
-        },
-    }
-    recorded_links = {
-        manifest["runtime_link"]["path"]: manifest["runtime_link"]["source"],
-        **{
-            name: item["source"] for name, item in manifest["skill_links"].items()
-        },
-    }
+    expected_links = {str(path): source for path, source in link_records(expected).items()}
+    recorded_links = {str(path): source for path, source in link_records(manifest).items()}
     missing_records = sorted(set(expected_links) - set(recorded_links))
     stale_records = sorted(set(recorded_links) - set(expected_links))
     if missing_records:
@@ -68,6 +65,10 @@ def _check_binding(
             + "、".join(stale_records)
             + "；请运行 relink 移除"
         )
+
+    if manifest.get("git_hooks", {}) != expected.get("git_hooks", {}):
+        errors.append("Git Hook 记录与当前领域策略不一致；请运行 relink 同步")
+    errors.extend(check_git_hooks(project, manifest.get("git_hooks", {})))
 
     for link_name, expected_source in expected_links.items():
         link = managed_path(project, link_name)

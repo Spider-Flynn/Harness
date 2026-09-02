@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from ..binding import desired_manifest
+from ..binding import desired_manifest, link_records
 from ..catalog import select_system
 from ..errors import HarnessError
 from ..filesystem import (
@@ -15,7 +15,19 @@ from ..filesystem import (
     remove_empty_parents,
     replace_symlink,
 )
-from ..paths import MANAGED_ROOT, MANIFEST_PATH, RUNTIME_LINK, SKILLS_ROOT
+from ..git_hooks import (
+    apply_git_hooks,
+    capture_git_hook_snapshot,
+    plan_git_hooks,
+    restore_git_hook_snapshot,
+)
+from ..paths import (
+    MANAGED_ROOT,
+    MANIFEST_PATH,
+    RESOURCES_ROOT,
+    RUNTIME_LINK,
+    SKILLS_ROOT,
+)
 from ..rules import restore_rules, rule_records, select_rule_files, write_rules
 from ..storage import project_lock, register_binding
 
@@ -27,12 +39,7 @@ def _preflight_init(project: Path, manifest: dict[str, Any]) -> None:
     managed_root = managed_path(project, MANAGED_ROOT)
     if managed_root.is_symlink():
         raise HarnessError(f"拒绝接管符号链接目录：{MANAGED_ROOT}")
-    if managed_root.exists() and any(managed_root.iterdir()):
-        raise HarnessError(f"项目已有非空 {MANAGED_ROOT}，拒绝接管")
-
-    link_names = [manifest["runtime_link"]["path"], *manifest["skill_links"]]
-    for link_name in link_names:
-        relative = Path(link_name)
+    for relative in link_records(manifest):
         target = managed_path(project, relative)
         if target.exists() or target.is_symlink():
             raise HarnessError(f"项目已有同路径内容，拒绝覆盖：{relative}")
@@ -53,10 +60,18 @@ def run(
     system = select_system(system_id)
     rule_paths = select_rule_files(project, rules_mode)
     rules = rule_records(project, rule_paths)
-    manifest = desired_manifest(project, system, selected_skills, rules)
 
     with project_lock(project):
+        git_hooks = plan_git_hooks(project, system)
+        manifest = desired_manifest(
+            project,
+            system,
+            selected_skills,
+            rules,
+            git_hooks,
+        )
         _preflight_init(project, manifest)
+        hook_snapshot = capture_git_hook_snapshot(project, git_hooks)
         registry_notice: str | None = None
         rule_snapshots = {
             path: (project / path).read_text(encoding="utf-8")
@@ -66,15 +81,12 @@ def run(
         }
         created_links: list[Path] = []
         try:
-            runtime = manifest["runtime_link"]
-            runtime_link = managed_path(project, runtime["path"])
-            replace_symlink(runtime_link, Path(runtime["source"]))
-            created_links.append(runtime_link)
-            for link_name, item in manifest["skill_links"].items():
-                link = managed_path(project, link_name)
-                replace_symlink(link, Path(item["source"]))
+            for relative, source in link_records(manifest).items():
+                link = managed_path(project, relative)
+                replace_symlink(link, Path(source))
                 created_links.append(link)
             write_rules(project, rules)
+            apply_git_hooks(project, git_hooks)
             atomic_write(
                 managed_path(project, MANIFEST_PATH),
                 json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
@@ -85,11 +97,13 @@ def run(
                 if link.is_symlink():
                     link.unlink()
             restore_rules(project, rule_snapshots)
+            restore_git_hook_snapshot(hook_snapshot)
             manifest_path = managed_path(project, MANIFEST_PATH)
             if manifest_path.is_file() and not manifest_path.is_symlink():
                 manifest_path.unlink()
             remove_empty_parents(project / RUNTIME_LINK.parent, project)
             remove_empty_parents(project / SKILLS_ROOT, project)
+            remove_empty_parents(project / RESOURCES_ROOT, project)
             if isinstance(exc, HarnessError):
                 raise
             raise HarnessError("接入失败，已恢复目标项目原状态") from exc
@@ -99,6 +113,14 @@ def run(
     print("规则入口：" + "、".join(str(path) for path in rule_paths))
     if selected_skills:
         print("可选 Skills：" + "、".join(sorted(set(selected_skills))))
+    if manifest["git_hooks"]:
+        hook_names = "、".join(manifest["git_hooks"])
+        branches = next(iter(manifest["git_hooks"].values()))[
+            "protected_branches"
+        ]
+        print(f"Git 提交门禁：{hook_names}（" + "、".join(branches) + "）")
+    else:
+        print("NOTICE 非 Git 项目未安装提交门禁")
     if registry_notice:
         print(f"NOTICE {registry_notice}")
     print("项目知识 build 为可选能力，不影响 Harness 处理正常需求。")

@@ -1,4 +1,0 @@
-interface:
-  display_name: "router"
-  short_description: "按风险规划需求的完整开发执行路线"
-  default_prompt: "使用 $router 根据已对齐的需求和项目事实，选择具体执行能力及其顺序，并决定稳定产物、TDD、测试类型和审计门禁。"

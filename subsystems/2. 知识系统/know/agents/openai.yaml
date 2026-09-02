@@ -1,0 +1,4 @@
+interface:
+  display_name: "know"
+  short_description: "按当前职责检索知识或依共享规范增量维护知识"
+  default_prompt: "使用 $know 按当前任务需要执行知识检索或增量沉淀，不默认串联两个阶段。"

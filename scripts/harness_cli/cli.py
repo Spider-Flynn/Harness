@@ -41,7 +41,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     relink_parser = commands.add_parser(
-        "relink", help="复用原选择重新建立 Runtime、Skills 与规则入口"
+        "relink", help="复用原选择重新建立 Runtime、Skills、规则入口与 Git Hook"
     )
     _add_project_argument(relink_parser)
 

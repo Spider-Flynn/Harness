@@ -1,0 +1,4 @@
+interface:
+  display_name: "router"
+  short_description: "复用场景并按复杂度与存量影响组合具体 Skill 链路"
+  default_prompt: "使用 $router 根据当前目标、项目事实和可用能力，参考相近场景组合具体 Skill 及顺序，明确测试模式、审计、跳过项和独立文档；不将任务套入固定流程。"

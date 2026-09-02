@@ -9,7 +9,7 @@ from typing import Any
 
 from .errors import HarnessError
 from .filesystem import read_json, safe_relative
-from .paths import HARNESS_ROOT, SYSTEMS_ROOT
+from .paths import SUBSYSTEMS_ROOT, SYSTEMS_ROOT
 
 
 SYSTEM_SCHEMA_VERSION = 1
@@ -17,6 +17,18 @@ SYSTEM_SCHEMA_VERSION = 1
 
 def validate_name(name: Any, *, label: str) -> str:
     if not isinstance(name, str) or not re.fullmatch(r"[a-z0-9-]{1,64}", name):
+        raise HarnessError(f"{label}名称无效：{name}")
+    return name
+
+
+def validate_branch_name(name: Any, *, label: str) -> str:
+    if (
+        not isinstance(name, str)
+        or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._/-]{0,127}", name)
+        or ".." in name
+        or "//" in name
+        or name.endswith(("/", "."))
+    ):
         raise HarnessError(f"{label}名称无效：{name}")
     return name
 
@@ -32,6 +44,41 @@ def _validate_system(raw: dict[str, Any], source: Path) -> dict[str, Any]:
     runtime = safe_relative(raw.get("runtime"), label="Runtime")
     if runtime != Path("runtime/HARNESS.md"):
         raise HarnessError(f"当前仅支持 runtime/HARNESS.md：{source}")
+
+    raw_resources = raw.get("resources", {})
+    if not isinstance(raw_resources, dict):
+        raise HarnessError(f"领域系统 resources 必须是对象：{source}")
+    resources: dict[str, str] = {}
+    for name, resource_source in raw_resources.items():
+        resource_name = validate_name(name, label="资源")
+        relative_source = safe_relative(resource_source, label=f"资源 {resource_name}")
+        resources[resource_name] = str(relative_source)
+
+    raw_git_hooks = raw.get("git_hooks", {})
+    supported_hooks = {"pre-commit", "prepare-commit-msg"}
+    if not isinstance(raw_git_hooks, dict) or set(raw_git_hooks) - supported_hooks:
+        raise HarnessError(f"领域系统 git_hooks 无效：{source}")
+    git_hooks: dict[str, dict[str, list[str]]] = {}
+    for hook_name, hook_config in raw_git_hooks.items():
+        if not isinstance(hook_config, dict) or set(hook_config) != {
+            "protected_branches"
+        }:
+            raise HarnessError(f"领域系统 {hook_name} 配置无效：{source}")
+        branches = (
+            hook_config.get("protected_branches")
+            if isinstance(hook_config, dict)
+            else None
+        )
+        if not isinstance(branches, list) or not branches:
+            raise HarnessError(f"领域系统 {hook_name} 保护分支无效：{source}")
+        normalized_branches = [
+            validate_branch_name(name, label="受保护分支") for name in branches
+        ]
+        if len(normalized_branches) != len(set(normalized_branches)):
+            raise HarnessError(f"领域系统 {hook_name} 保护分支重复：{source}")
+        git_hooks[hook_name] = {
+            "protected_branches": normalized_branches,
+        }
 
     groups = raw.get("skills")
     required_groups = {
@@ -67,6 +114,8 @@ def _validate_system(raw: dict[str, Any], source: Path) -> dict[str, Any]:
         "name": raw["name"].strip(),
         "description": str(raw.get("description", "")).strip(),
         "runtime": str(runtime),
+        "resources": resources,
+        "git_hooks": git_hooks,
         "skills": normalized_groups,
     }
 
@@ -128,7 +177,7 @@ def _skill_name(skill_dir: Path) -> str:
 
 def _discover_skills() -> dict[str, Path]:
     skills: dict[str, Path] = {}
-    for skill_file in sorted((HARNESS_ROOT / "skills").glob("*/*/SKILL.md")):
+    for skill_file in sorted(SUBSYSTEMS_ROOT.glob("*/*/SKILL.md")):
         skill_dir = skill_file.parent
         name = _skill_name(skill_dir)
         if name != skill_dir.name:

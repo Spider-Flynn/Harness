@@ -1,0 +1,4 @@
+interface:
+  display_name: "build"
+  short_description: "先确认信息源，通过问答按共享规范建设项目知识"
+  default_prompt: "使用 $build 先向我索取或确认信息源，再按本次范围建设项目知识；不要默认读取代码。"

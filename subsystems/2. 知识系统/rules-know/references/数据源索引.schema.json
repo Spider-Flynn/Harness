@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "项目数据源单索引",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["description", "primary_source", "sources", "tables", "datasets"],
+  "properties": {
+    "description": {"$ref": "#/$defs/text"},
+    "primary_source": {"anyOf": [{"$ref": "#/$defs/text"}, {"type": "null"}]},
+    "sources": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {"minLength": 1},
+      "additionalProperties": {"$ref": "#/$defs/source"}
+    },
+    "tables": {
+      "type": "object",
+      "propertyNames": {"minLength": 1},
+      "additionalProperties": {"$ref": "#/$defs/table"}
+    },
+    "datasets": {
+      "type": "object",
+      "propertyNames": {"minLength": 1},
+      "additionalProperties": {"$ref": "#/$defs/dataset"}
+    }
+  },
+  "$defs": {
+    "text": {"type": "string", "minLength": 1},
+    "textList": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/text"}
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "type", "description", "evidence"],
+      "properties": {
+        "name": {"$ref": "#/$defs/text"},
+        "type": {"$ref": "#/$defs/text"},
+        "description": {"$ref": "#/$defs/text"},
+        "evidence": {"$ref": "#/$defs/text"}
+      }
+    },
+    "table": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "database", "name", "description", "ddl", "evidence"],
+      "properties": {
+        "source": {"$ref": "#/$defs/text"},
+        "database": {"$ref": "#/$defs/text"},
+        "schema": {"$ref": "#/$defs/text"},
+        "name": {"$ref": "#/$defs/text"},
+        "description": {"$ref": "#/$defs/text"},
+        "ddl": {"anyOf": [{"$ref": "#/$defs/text"}, {"type": "null"}]},
+        "key_fields": {
+          "type": "object",
+          "propertyNames": {"minLength": 1},
+          "additionalProperties": {"$ref": "#/$defs/text"}
+        },
+        "related_tables": {"$ref": "#/$defs/textList"},
+        "evidence": {"$ref": "#/$defs/text"}
+      }
+    },
+    "dataset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "description", "files", "tables", "origin", "usage", "coverage", "evidence"],
+      "properties": {
+        "source": {"$ref": "#/$defs/text"},
+        "description": {"$ref": "#/$defs/text"},
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/text"}
+        },
+        "tables": {"$ref": "#/$defs/textList"},
+        "origin": {"enum": ["provided", "generated"]},
+        "usage": {"$ref": "#/$defs/text"},
+        "coverage": {"$ref": "#/$defs/text"},
+        "evidence": {"$ref": "#/$defs/text"}
+      }
+    }
+  }
+}

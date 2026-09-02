@@ -1,0 +1,6 @@
+interface:
+  display_name: "rules-know"
+  short_description: "为 build 与 know 提供共享知识结构、质量规则和按需模板索引"
+  default_prompt: "使用 $rules-know 读取当前 build 或 know 沉淀所需的知识规则，不代替调用方问答或写入。"
+policy:
+  allow_implicit_invocation: false

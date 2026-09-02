@@ -1,0 +1,50 @@
+{
+  "description": "填写示例，不是项目事实：以订单核心库为主，仅引用客户系统的一张表；所列文件路径需要用真实资产替换。",
+  "primary_source": "core",
+  "sources": {
+    "core": {
+      "name": "订单核心库（示例）",
+      "type": "MySQL",
+      "description": "维护订单主数据，只登记当前项目需要的表。",
+      "evidence": "示例占位：替换为用户提供的数据源说明。"
+    },
+    "crm": {
+      "name": "客户系统数据源（示例）",
+      "type": "MySQL",
+      "description": "外部项目提供客户表引用，不建设对方完整数据目录。",
+      "evidence": "示例占位：替换为用户提供的客户表材料。"
+    }
+  },
+  "tables": {
+    "core.sales.orders": {
+      "source": "core",
+      "database": "sales",
+      "name": "orders",
+      "description": "订单主体及其当前状态。",
+      "ddl": ".harness/know/数据源/core/schema/orders.sql",
+      "key_fields": {"customer_id": "关联客户主体，不直接作为客户名称使用。"},
+      "related_tables": ["crm.customers.customer"],
+      "evidence": "示例占位：替换为实际表结构与字段语义材料。"
+    },
+    "crm.customers.customer": {
+      "source": "crm",
+      "database": "customers",
+      "name": "customer",
+      "description": "外部客户主体；示例仅知道用途，尚未提供完整 DDL。",
+      "ddl": null,
+      "evidence": "示例占位：替换为已确认的外部表说明。"
+    }
+  },
+  "datasets": {
+    "order-lifecycle": {
+      "source": "core",
+      "description": "订单状态测试样本（示例，不代表真实已有数据）。",
+      "files": [".harness/know/数据源/core/datasets/order-lifecycle.csv"],
+      "tables": ["core.sales.orders"],
+      "origin": "provided",
+      "usage": "替换为实际使用方法：适用环境、准备步骤、消费入口及必要前置条件；本说明不授权导入。",
+      "coverage": "替换为实际覆盖场景与未覆盖边界，不把文件存在描述为已执行验证。",
+      "evidence": "示例占位：替换为用户提供的数据集说明。"
+    }
+  }
+}

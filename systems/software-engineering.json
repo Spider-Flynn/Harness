@@ -4,11 +4,30 @@
   "name": "软件工程",
   "description": "面向代码项目的需求理解、开发、验证、审计与知识沉淀系统。",
   "runtime": "runtime/HARNESS.md",
+  "git_hooks": {
+    "pre-commit": {
+      "protected_branches": [
+        "main",
+        "master",
+        "test",
+        "pre"
+      ]
+    },
+    "prepare-commit-msg": {
+      "protected_branches": [
+        "main",
+        "master",
+        "test",
+        "pre"
+      ]
+    }
+  },
   "skills": {
     "default": [
       "intent",
       "know",
       "build",
+      "rules-know",
       "router",
       "tec-design",
       "test-design",
