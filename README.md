@@ -17,7 +17,7 @@ Harness Engineering 是围绕 Agent 和 LLM 的运行与编排框架。本仓库
 | `runtime/HARNESS.md` | 接入业务代码仓库后需要加载的唯一运行合同 |
 | `systems/` | 可插拔领域系统清单，声明 Runtime 与各类 Skill 投影边界 |
 | `skills/` | 按职责域分类的 Harness 能力源码 |
-| `scripts/` | 仓库维护、能力投影和业务项目接入工具 |
+| `scripts/` | 统一 CLI 入口及分模块的业务项目接入实现 |
 | `data/` | 本地绑定项目索引等轻量数据，按需生成，Git 忽略 |
 
 主要入口：
@@ -62,12 +62,16 @@ Harness Engineering 是围绕 Agent 和 LLM 的运行与编排框架。本仓库
 ## 接入工具
 
 第一版接入采用“确定性 CLI 核心 + AI 辅助交互”。AI 可以帮助用户判断项目和组织参数，但所有绑定
-结果都由 `scripts/harness.py` 产生，不维护另一套 AI 专用实现。
+操作都通过 `scripts/harness.py` 执行。内部已按命令和职责拆分，使用时不需要逐个运行 Python 模块。
+
+接入工具使用 Python 3.10+ 和标准库，依赖 POSIX 文件锁与符号链接，适用于 macOS/Linux；当前冒烟
+验证环境为 macOS，未适配原生 Windows。不需要额外安装 Python 依赖。
 
 在已读取本仓库 `AGENTS.md` 的 AI 会话中，可以直接说 `init`，或说“init，把软件工程系统接入
 `/你的项目目录`”。AI 会按 [init 指引](./command/init.md) 收集必要选择、执行脚本并反馈检查结果；已有绑定
 可说 `relink`，也支持 `doctor`、`remove`、`list` 及对应的自然语言请求。这些是本仓库的对话约定，
 不是全局命令。该对话入口仍是未正式启用的初稿，尚未经过真实接入会话验证。
+`command/` 中的指引负责 AI 交互，实际操作调用同一 CLI，与手动执行使用相同实现。
 
 也可以自行运行以下 CLI 命令：
 
@@ -88,14 +92,12 @@ python3 scripts/harness.py list
 绑定后，目标项目中的 `.harness/runtime/HARNESS.md` 和 `.agents/skills/<skill>` 都是指向本仓库唯一
 源码的软链接；`.harness/manifest.json` 保存该项目选择的系统、规则入口和可选能力，本仓库
 `data/projects.json` 只作为 `list` 的项目索引。所有本地辅助数据保存在本仓库 `data/` 下并由 Git
-忽略，不写入用户主目录。接入工具在现有 `AGENTS.md`、`CLAUDE.md` 中
-维护最小加载片段；两者都不存在时，交互模式会说明生态并询问创建哪一个，非交互模式必须通过
-`--rules` 明确指定。
+忽略，不写入用户主目录。接入工具在现有 `AGENTS.md`、`CLAUDE.md` 中维护最小加载片段；两者都不
+存在时，交互模式会说明生态并询问创建哪一个，非交互模式必须通过 `--rules` 明确指定。
 
 `relink` 复用目标项目清单中的原选择，重新建立 Runtime、Skills、规则片段和本机索引，不重新选择
 项目或领域系统；Harness 源目录移动或链接损坏后也使用该命令修复。`doctor` 只检查，`remove` 只移除
-受管链接、片段和记录；旧的复制 Runtime 与 `update` 模型已经移除。Hook 加载器和 TUI 当前不实现，
-只有真实使用证明规则入口不足且目标宿主支持时再增加适配器。
+受管链接、片段和记录。当前未提供 Hook 加载器和 TUI。
 
 本机索引是辅助缓存：缺失或损坏不会阻断目标项目的 `doctor`、`relink` 或 `remove`。`relink` 会将
 内容损坏的普通索引隔离备份并重建当前项目记录；若索引路径被目录或软链接占用，工具会要求用户先
@@ -103,11 +105,3 @@ python3 scripts/harness.py list
 
 上述接入链已通过临时 Git 目录的受控冒烟，但尚未接入真实业务项目，也不代表软件工程 Harness 的
 需求开发、知识沉淀、审计和演进主链已经验证或启用。`build` 始终是可选能力。
-
-## 维护原则
-
-- 修改前先读取当前文件和直接合同，区分当前实现、目标设计和验证结果。
-- 跨系统调度、交接、反馈、重新规划和最终汇总只归 `runtime/HARNESS.md`。
-- 仓库维护规则归 `AGENTS.md`，变化中的工作项归 `TODO.md`，Skill 内部方法归对应 Skill。
-- 不把静态检查、Mock、模型自述或脚本存在描述成真实业务行为已经通过。
-- `cooper` 和 `mock` 永久保持本机忽略，不使用强制添加绕过。
