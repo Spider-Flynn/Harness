@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "id": "software-engineering",
+  "name": "软件工程",
+  "description": "面向代码项目的需求理解、开发、验证、审计与知识沉淀系统。",
+  "runtime": "runtime/HARNESS.md",
+  "skills": {
+    "default": [
+      "intent",
+      "know",
+      "build",
+      "router",
+      "tec-design",
+      "test-design",
+      "coding",
+      "debug",
+      "unit-test",
+      "it-test",
+      "audit"
+    ],
+    "conditional": [
+      "biz"
+    ],
+    "local": [
+      "cooper",
+      "mock"
+    ],
+    "horizontal": [
+      "subagent"
+    ],
+    "personal": [
+      "cr"
+    ],
+    "evolution": [
+      "retro",
+      "skill-creator",
+      "skill-neat"
+    ]
+  }
+}
