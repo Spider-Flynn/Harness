@@ -26,7 +26,7 @@ from ..rules import restore_rules, validate_rule_target, write_rules
 from ..storage import project_lock, register_binding
 
 
-def run(project: Path) -> None:
+def run(project: Path, skip_git_hooks: bool = False) -> None:
     with project_lock(project):
         old_manifest = load_binding_manifest(project)
         systems = discover_systems()
@@ -36,13 +36,18 @@ def run(project: Path) -> None:
         system = systems[system_id]
         rules = old_manifest["rules_files"]
         old_git_hooks = old_manifest.get("git_hooks", {})
-        git_hooks = plan_git_hooks(project, system, old_git_hooks)
+        is_skipped = skip_git_hooks or old_manifest.get("git_hooks_skipped", False)
+        if is_skipped:
+            git_hooks = {}
+        else:
+            git_hooks = plan_git_hooks(project, system, old_git_hooks)
         new_manifest = desired_manifest(
             project,
             system,
             old_manifest["selected_skills"],
             rules,
             git_hooks,
+            git_hooks_skipped=is_skipped,
         )
 
         old_links = link_records(old_manifest)
@@ -77,7 +82,8 @@ def run(project: Path) -> None:
                 if link.is_symlink():
                     link.unlink()
             write_rules(project, rules)
-            apply_git_hooks(project, git_hooks, old_git_hooks)
+            if not is_skipped:
+                apply_git_hooks(project, git_hooks, old_git_hooks)
             atomic_write(
                 managed_path(project, MANIFEST_PATH),
                 json.dumps(new_manifest, ensure_ascii=False, indent=2) + "\n",
@@ -99,5 +105,7 @@ def run(project: Path) -> None:
     print(f"领域系统：{system['name']} ({system['id']})")
     if new_manifest["git_hooks"]:
         print("Git 提交门禁：pre-commit、prepare-commit-msg 已同步")
+    elif is_skipped:
+        print("NOTICE Git 提交门禁已显式跳过，当前未受管")
     if registry_notice:
         print(f"NOTICE {registry_notice}")

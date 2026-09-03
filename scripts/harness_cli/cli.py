@@ -39,11 +39,21 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="显式允许绑定没有 .git 的目录",
     )
+    init_parser.add_argument(
+        "--skip-git-hooks",
+        action="store_true",
+        help="显式跳过 Git Hook 的检查与安装（如项目已使用 Husky 或 linked worktree）",
+    )
 
     relink_parser = commands.add_parser(
         "relink", help="复用原选择重新建立 Runtime、Skills、规则入口与 Git Hook"
     )
     _add_project_argument(relink_parser)
+    relink_parser.add_argument(
+        "--skip-git-hooks",
+        action="store_true",
+        help="强制跳过 Git Hook 的检查与同步",
+    )
 
     doctor_parser = commands.add_parser("doctor", help="检查当前项目绑定")
     _add_project_argument(doctor_parser)
@@ -69,9 +79,10 @@ def main() -> int:
                     args.rules,
                     args.with_skill,
                     args.allow_non_git,
+                    args.skip_git_hooks,
                 )
             elif args.command == "relink":
-                relink.run(project)
+                relink.run(project, args.skip_git_hooks)
             elif args.command == "doctor":
                 doctor.run(project)
             elif args.command == "remove":

@@ -35,7 +35,8 @@
       "debug",
       "unit-test",
       "it-test",
-      "audit"
+      "audit",
+      "retro"
     ],
     "conditional": [
       "biz"
@@ -51,7 +52,6 @@
       "cr"
     ],
     "evolution": [
-      "retro",
       "skill-creator",
       "skill-neat"
     ]

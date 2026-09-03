@@ -81,7 +81,7 @@ def git_hooks_directory(project: Path) -> Path | None:
     if configured_hooks.stdout.strip():
         raise HarnessError(
             "目标项目已经配置 core.hooksPath；为避免改动共享或自定义 Hook，"
-            "当前版本拒绝自动接管"
+            "当前版本拒绝自动接管。如需仅接入 Runtime 与 Skills，请使用 --skip-git-hooks"
         )
 
     git_directory = _git_path(
@@ -100,7 +100,7 @@ def git_hooks_directory(project: Path) -> Path | None:
     if git_directory != common_directory:
         raise HarnessError(
             "目标项目是 linked worktree；其 Hook 会影响同仓库其他工作树，"
-            "当前版本拒绝自动接管"
+            "当前版本拒绝自动接管。如需仅接入 Runtime 与 Skills，请使用 --skip-git-hooks"
         )
     return git_directory / "hooks"
 

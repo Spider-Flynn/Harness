@@ -4,6 +4,7 @@
 
 1. 确定项目路径，缺少时询问；结合目录和用户说明判断是否适用，新项目不要求已有代码。
    未发现 `.git` 时，确认适用后使用 `--allow-non-git`，不替用户初始化 Git，并说明不会安装提交门禁。
+   若项目已配置 Husky / `core.hooksPath` 或属于 linked worktree，说明当前无法自动接管 Hook，使用 `--skip-git-hooks` 仅接入 Runtime 与 Skills。
 2. 读取 `systems/`：只有一个领域系统时自动选择并告知；多个时推荐并确认。
    默认能力不逐项询问，可选能力只在用户需要时选择。
 3. 复用项目已有的 `AGENTS.md`、`CLAUDE.md`，两者都有就都接入。两者都没有时，说明

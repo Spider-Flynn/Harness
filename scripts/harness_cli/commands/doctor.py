@@ -27,11 +27,16 @@ def _check_binding(
         errors.append(f"当前源码缺少领域系统：{manifest['system_id']}")
         return errors, notices
 
+    is_skipped = manifest.get("git_hooks_skipped", False)
     try:
-        expected_git_hooks = plan_git_hooks(
-            project,
-            system,
-            manifest.get("git_hooks", {}),
+        expected_git_hooks = (
+            {}
+            if is_skipped
+            else plan_git_hooks(
+                project,
+                system,
+                manifest.get("git_hooks", {}),
+            )
         )
         expected = desired_manifest(
             project,
@@ -39,6 +44,7 @@ def _check_binding(
             manifest["selected_skills"],
             manifest["rules_files"],
             expected_git_hooks,
+            git_hooks_skipped=is_skipped,
         )
     except HarnessError as exc:
         errors.append(str(exc))
@@ -66,9 +72,12 @@ def _check_binding(
             + "；请运行 relink 移除"
         )
 
-    if manifest.get("git_hooks", {}) != expected.get("git_hooks", {}):
-        errors.append("Git Hook 记录与当前领域策略不一致；请运行 relink 同步")
-    errors.extend(check_git_hooks(project, manifest.get("git_hooks", {})))
+    if is_skipped:
+        notices.append("Git Hook 门禁已显式跳过，当前未受管")
+    else:
+        if manifest.get("git_hooks", {}) != expected.get("git_hooks", {}):
+            errors.append("Git Hook 记录与当前领域策略不一致；请运行 relink 同步")
+        errors.extend(check_git_hooks(project, manifest.get("git_hooks", {})))
 
     for link_name, expected_source in expected_links.items():
         link = managed_path(project, link_name)

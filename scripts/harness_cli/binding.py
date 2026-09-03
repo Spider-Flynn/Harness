@@ -29,6 +29,7 @@ def desired_manifest(
     selected_skills: list[str],
     rules: list[dict[str, Any]],
     git_hooks: dict[str, dict[str, Any]] | None = None,
+    git_hooks_skipped: bool = False,
 ) -> dict[str, Any]:
     runtime_source = (HARNESS_ROOT / system["runtime"]).resolve()
     if not runtime_source.is_file():
@@ -60,6 +61,7 @@ def desired_manifest(
         "selected_skills": sorted(set(selected_skills)),
         "rules_files": rules,
         "git_hooks": git_hooks or {},
+        "git_hooks_skipped": bool(git_hooks_skipped),
     }
     _validate_binding_manifest(manifest)
     return manifest
@@ -140,6 +142,9 @@ def _validate_binding_manifest(manifest: dict[str, Any]) -> None:
         ):
             raise HarnessError("项目绑定清单包含非法规则入口")
         seen_rules.add(item["path"])
+
+    if "git_hooks_skipped" in manifest and not isinstance(manifest["git_hooks_skipped"], bool):
+        raise HarnessError("项目绑定清单 git_hooks_skipped 必须是布尔值")
 
     # schema_version 2 没有 Git Hook 合同；由 relink 升级为 version 3 并补齐。
     git_hooks = manifest.get("git_hooks", {})

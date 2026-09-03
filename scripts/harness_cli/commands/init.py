@@ -51,6 +51,7 @@ def run(
     rules_mode: str,
     selected_skills: list[str],
     allow_non_git: bool,
+    skip_git_hooks: bool = False,
 ) -> None:
     if not allow_non_git and not (project / ".git").exists():
         raise HarnessError(
@@ -62,13 +63,14 @@ def run(
     rules = rule_records(project, rule_paths)
 
     with project_lock(project):
-        git_hooks = plan_git_hooks(project, system)
+        git_hooks = {} if skip_git_hooks else plan_git_hooks(project, system)
         manifest = desired_manifest(
             project,
             system,
             selected_skills,
             rules,
             git_hooks,
+            git_hooks_skipped=skip_git_hooks,
         )
         _preflight_init(project, manifest)
         hook_snapshot = capture_git_hook_snapshot(project, git_hooks)
@@ -86,7 +88,8 @@ def run(
                 replace_symlink(link, Path(source))
                 created_links.append(link)
             write_rules(project, rules)
-            apply_git_hooks(project, git_hooks)
+            if not skip_git_hooks:
+                apply_git_hooks(project, git_hooks)
             atomic_write(
                 managed_path(project, MANIFEST_PATH),
                 json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
@@ -119,6 +122,8 @@ def run(
             "protected_branches"
         ]
         print(f"Git 提交门禁：{hook_names}（" + "、".join(branches) + "）")
+    elif skip_git_hooks:
+        print("NOTICE Git 提交门禁已显式跳过，当前未受管")
     else:
         print("NOTICE 非 Git 项目未安装提交门禁")
     if registry_notice:
